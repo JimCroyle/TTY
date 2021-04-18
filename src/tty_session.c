@@ -11,6 +11,7 @@
  * 3. up and down arrows support command history
  * 4. 
  */
+#include "common.h"
 #include "tty_session.h"
 
 static Result_t RunLogin    (TtySession_t *tty);
