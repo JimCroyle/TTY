@@ -12,6 +12,8 @@
 
 typedef struct _Buffer_s
 {
+    uint32_t id;
+    
     struct _Buffer_s *next;
     struct _Buffer_s *prev;
 
