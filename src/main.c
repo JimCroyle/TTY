@@ -1,6 +1,5 @@
-/* main.c
+/* main.c ~ test program for TTY lib
  * 
- * stdio based test interface for MyTty console interface module. compiling this main.c
  * provides functionality for providing automated unit testing followed by interfactive
  * testing.  A basic set of commands are provided to test/demo various MyTty features.
  */
@@ -14,14 +13,6 @@
 static int RunUnitTests (void);
 static int RunInteractive (void);
 
-TtyConfig_t tty_config_tbl[] = 
-{
-    TTY_CONFIG_INIT,
-    TTY_CONFIG_INIT,
-    TTY_CONFIG_INIT
-}
-static int NumConfig = NUM_ELEMENTS(tty_config_tbl);
-
 /*** main test program entry point
 */
 int main (int argc, char *argv[])
@@ -32,7 +23,7 @@ int main (int argc, char *argv[])
     DBG_ASSERT(false);  
     #endif
 
-    printf("\nMyTty Test Program\n\n");
+    printf("\nTTY Test Program\n\n");
     RunUnitTests();
     RunInteractive();
 }

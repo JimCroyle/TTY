@@ -11,7 +11,6 @@
  * 3. up and down arrows support command history
  * 4. 
  */
-#include "common.h"
 #include "tty_session.h"
 
 static Result_t RunLogin    (TtySession_t *tty);
@@ -26,13 +25,14 @@ static Result_t RunLocked   (TtySession_t *tty);
 Result_t tty_NewSession ( TtySession **tty, TtyConfig_t *cfg )
 {
     Result_t result = SUCCESS;
-    TtySession_t *new_tty = osal_Malloc(sizeof(TtySession));
-    if ( NULL == new_tty )
+    TtySession_t *new_tty = sal_Malloc(sizeof(TtySession_t));
+    if ( NULL == *new_tty )
         result = ERR_ALLOC_FAIL;
     else
     {
+        static const TtySession_t init_session = TTY_SESSION_INIT;
+        memcpy(new_tty, &init_session, sizeof(TtySession_t));
         *tty = new_tty;
-        memcpy(&tty->cfg, cfg, sizeof(TtyConfig_t));
     }
 
     return result;
@@ -63,7 +63,7 @@ Result_t tty_RunSession ( TtySession_t *tty )
 Result_t tty_EndSession ( TtySession_t *tty )
 {
     DBG_ASSERT(tty!=NULL);
-    osal_Free(tty);
+    sal_Free(tty);
     return RESULT_OK;
 }
 
@@ -71,6 +71,7 @@ Result_t tty_EndSession ( TtySession_t *tty )
 */
 static Result_t RunLogin    (TtySession_t *tty);
 {
+    
     DBG_ASSERT(TS_LOGIN == tty->state);
     return ERR_NOT_IMPLEMENTED;
 }

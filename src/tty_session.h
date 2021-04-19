@@ -20,7 +20,7 @@ typedef struct _TtyInput_s
 {
 
     Buffer_t *buf;
-    int     cursor;         /* cursor location */
+    int     cursor_i;       /* cursor location within input line */
     bool    insert;         /* true=insert chars, false=overwrite */
 
 }   TtyInput_t;
@@ -29,7 +29,6 @@ typedef struct _TtyInput_s
 */
 typedef struct _TtyOutput_s
 {
-
     Buffer_t *buf;
 
 }   TtyOutput_t;
@@ -55,6 +54,17 @@ typedef enum _TtyState_e
  */
 typedef int (GetChar_FP)(uint8_t *ch);
 typedef int (PutChar_FP)(uint8_t  ch);
+
+typedef struct _tty_Driver_s
+{
+    GetChar_FP *GetChar;
+    PutChar_FP *PutChar;
+
+}   tty_Driver_t;
+
+#define TTY_DRIVER_INIT {   \
+        .GetChar = getchar; \
+        .PutChar = putchar; }
 
 /*** terminal session options
 */
@@ -83,34 +93,19 @@ typedef struct _TtyLogin_s
     char username[TTY_USERNAME_SIZE];
     char password[TTY_PASSWORD_SIZE];
 
-    bool     locked;   /* true when max # attempts exceeded */
-    uint64_t time;    /* last login attempt, ctr=0 after a period */
-    uint32_t ctr;     /* bumped on every login attempt */
-    uint32_t id;      /* unique login ID */
+    bool     enabled;   /* true when max # attempts exceeded */
+    bool     locked;    /* true when max # attempts exceeded */
+    uint64_t time;      /* last login attempt, ctr=0 after a period */
+    uint32_t ctr;       /* bumped on every login attempt */
+    uint32_t id;        /* unique login ID */
 
 }   TtyLogin_t;
 
 #define TTY_LOGIN_INIT {   \
         .username = "",    \
-        .password = ""     \
+        .password = "",    \
+        .enabled = true,   \
         .locked = false    }
-
-/*** terminal session configuration
-*/
-typedef struct _TtyConfig_s
-{
-    GetChar_FP     *GetChar;
-    PutChar_FP     *PutChar;
-    TtyOptions_t    opt;
-    TtyLogin_t      login;
-
-}   TtyConfig_t;
-
-#define TTY_CONFIG_INIT {   \
-        .GetChar=NULL,      \
-        .PutChar=NULL,      \
-        .opt = TTY_OPTIONS_INIT, \
-        .login = TTY_LOGIN_INIT }
 
 /*** terminal session context
 */
@@ -118,13 +113,22 @@ typedef struct _TtySession_s
 {
     char prompt_str[PROMPT_STR_SIZE];
 
-    TtyConfig_t  cfg;       /* session configuration data */
+    TtyDriver_t  serial;    /* de/serializer functions */
+    TtyOptions_t option;    /* session options */
+    TtyLogin_t   login;     /* login configuration */
     TtyInput_t   inp;       /* intput character buffer */
     TtyOutput_t  out;       /* output character buffer */
     TtyState_t   state;     /* terminal session state */
     CmdState_t   cmd;       /* command state information */
 
 } TtySession_t;
+
+#define TTY_SESSION_INIT  {         \
+        .serial = TTY_DRIVER_INIT,  \
+        .option = TTY_OPTIONS_INIT, \
+        .login  = TTY_LOGIN_INIT,   \
+        .state  = TS_LOGIN,         \
+        .cmd    = CS_PROMPT         }
 
 /*** terminal session API
 */
