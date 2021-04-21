@@ -4,9 +4,9 @@
 #ifndef __SAL__
 #define __SAL__
 
-#include <common.h>
-#include <ctypes.h>
 #include <time.h>
+
+#include "common.h"
 
 /*** SAL initialization - must be called prior to first API call
 */
